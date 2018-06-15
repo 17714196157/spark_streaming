@@ -1,0 +1,49 @@
+fieldname:
+  ADDRESS: basic_info
+  BUSINESS_LICENSE: basic_info
+  CITY: city
+  EMAIL: company_web_top
+  INDUSTRY: basic_info
+  LEGAL_PERSON: basic_info
+  NAME: company_web_top
+  PROVINCE: province
+  REGISTER_CAPITAL: basic_info
+  REGISTER_TIME: basic_info
+  REG_CAPITAL: .nan
+  REG_TIME: .nan
+  STATUS: basic_info
+  TEL: company_web_top
+  URBAN_AREA: .nan
+regular:
+  ADDRESS: register_addr
+  BUSINESS_LICENSE: organization_code
+  CITY: .nan
+  EMAIL: email
+  INDUSTRY: industry
+  LEGAL_PERSON: legal_person
+  NAME: company_name
+  PROVINCE: .nan
+  REGISTER_CAPITAL: register_capital
+  REGISTER_TIME: register_time
+  REG_CAPITAL: .nan
+  REG_TIME: .nan
+  STATUS: company_status
+  TEL: tel
+  URBAN_AREA: .nan
+Data_cleaning_regular:
+  ADDRESS: .nan
+  BUSINESS_LICENSE: .nan
+  CITY: .nan
+  EMAIL: .nan
+  INDUSTRY: .nan
+  LEGAL_PERSON: .nan
+  NAME: .nan
+  PROVINCE: .nan
+  REGISTER_CAPITAL: (\d+)[.]*.*万
+  REGISTER_TIME: (\d{4}).*年
+  REG_CAPITAL: .nan
+  REG_TIME: .nan
+  STATUS: .nan
+  TEL: (0\d{2,3}[-－—]*\s*\d{7,8}.*)|(1[35847]\d{9})
+  URBAN_AREA: .nan
+

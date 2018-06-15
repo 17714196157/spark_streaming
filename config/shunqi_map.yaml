@@ -1,0 +1,49 @@
+fieldname:
+  ADDRESS: addr
+  BUSINESS_LICENSE: business_license
+  CITY: city_name
+  EMAIL: email
+  INDUSTRY: company_classe
+  LEGAL_PERSON: shareholder_list
+  NAME: company_name
+  PROVINCE: province_name
+  REGISTER_CAPITAL: register_capital
+  REGISTER_TIME: establish
+  REG_CAPITAL: reg_capital
+  REG_TIME: reg_time
+  STATUS: status
+  TEL: tel
+  URBAN_AREA: area_name
+regular:
+  ADDRESS: .nan
+  BUSINESS_LICENSE: .nan
+  CITY: .nan
+  EMAIL: .nan
+  INDUSTRY: .nan
+  LEGAL_PERSON: shareholder_name
+  NAME: .nan
+  PROVINCE: .nan
+  REGISTER_CAPITAL: .nan
+  REGISTER_TIME: .nan
+  REG_CAPITAL: .nan
+  REG_TIME: .nan
+  STATUS: .nan
+  TEL: .nan
+  URBAN_AREA: .nan
+Data_cleaning_regular:
+  ADDRESS: .nan
+  BUSINESS_LICENSE: .nan
+  CITY: .nan
+  EMAIL: .nan
+  INDUSTRY: .nan
+  LEGAL_PERSON: .nan
+  NAME: .nan
+  PROVINCE: .nan
+  REGISTER_CAPITAL: (\d+)[.]*.*万
+  REGISTER_TIME: (\d{4}).*年
+  REG_CAPITAL: .nan
+  REG_TIME: .nan
+  STATUS: .nan
+  TEL: (0\d{2,3}[-－—]*\s*\d{7,8}.*)|(1[35847]\d{9})
+  URBAN_AREA: .nan
+
