@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import yaml
 BASE_PATH = os.path.dirname(os.path.dirname(__file__))
-print(BASE_PATH)
+# print(BASE_PATH)
 config_path = os.path.join(BASE_PATH, 'config')
 
 INPUT_PATH = os.path.join(BASE_PATH, 'input')
@@ -18,6 +18,11 @@ with open(os.path.join(config_path, "setting.yaml"), mode='r', encoding='utf-8')
     kafka_out_topic = str(setting_yml['kafka_out_topic']).encode(encoding='utf-8')  # 字符串转成 bytes
     WEB_SOURCE_LIST = setting_yml['WEB_SOURCE_LIST']  # 单独运行 mongodb_Data_cleaning_to_csv生成csv文件,需要配置需要做那些爬虫数据库
     savedb = dbconfig['savedb']
+
+
+with open(os.path.join(config_path, "province.yaml"), mode='r', encoding='utf-8') as f:
+    province_map_city = yaml.load(f)   # 省份 下属那些城市多的 字典
+
 
 # 读取每个网页字段与标准字段映射关系 file_map.xlsx
 if "df" not in vars():
@@ -38,16 +43,12 @@ if "df" not in vars():
     df.index = range(0, df.shape[0])
     df['default'] = df['default'].astype("str")
     # input(df)
-    #
-    #
     # df = pd.read_excel(os.path.join(config_path, 'file_map.xlsx'), encoding='utf-8', eindex_col=False)
     # df['default'] = df['default'].astype("str")
-
-
     column_name_list = df['hbase字段名'].values.tolist()
     column_name_list.insert(0, "ID")
     column_name_list.append("WEB_SOURCE")
-    print(column_name_list)
+    # print(column_name_list)
 
     REGISTER_TIME_ENUM = {'1': [-1, 2018],
                           '2': [2017, 2013],
@@ -66,8 +67,4 @@ if "df" not in vars():
     zk_Quorum = "192.168.1.70:2181"
     # kafka_Quorum = "192.168.1.45:9092,192.168.1.70:9092,192.168.1.171:9092"
     kafka_Quorum = "192.168.1.45:9092"
-
-
-
-
-
+    df.to_excel("file_map.xlsx",index=False)

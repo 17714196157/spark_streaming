@@ -6,6 +6,8 @@ import pandas as pd
 from config.setting import config_path
 from config.setting import OUTPUT_PATH
 from config.setting import INPUT_PATH
+from config.setting import column_name_list
+# 存在如下行业分类
 # str = '''IT/通信/电子/互联网 金融业 房地产/建筑业 法律 商业服务 医疗/健康 贸易/批发/零售/租赁业 生产/加工/制造 交通/运输/物流/仓储 服务业 体育/休闲/旅游/娱乐 能源/矿产/环保 政府/非盈利机构 媒体 教育 农/林/牧/渔 跨领域经营 其他'''
 # for item in str.split(' '):
 #     print(item+":")
@@ -63,7 +65,7 @@ class industry_classify(object):
     def industry_judge(self, word):
         for key in self.industry_dict.keys():
             if word in self.industry_dict[key].keys():
-                print(word, " 命中分类 ", key)
+                # print(word, " 命中分类 ", key)
                 return key
         else:
             return None
@@ -126,7 +128,7 @@ class industry_classify(object):
 
             if input_key == "save":
                 self.save()
-                input_key = input(str(index)+ "word:" + word + " 你要作为那个分类的关键字 不能作为关键字请回车").strip()
+                input_key = input(str(index) + "word:" + word + " 你要作为那个分类的关键字 不能作为关键字请回车").strip()
 
             if input_key.isdigit():
                 input_key = int(input_key)
@@ -181,10 +183,14 @@ def run(startid=None, endid=None):
     with open(OUTPUT_PATH + os.sep + 'all_new.csv', mode='r', encoding='utf-8') as f, \
             open(OUTPUT_PATH + os.sep + 'fgood_all_new.csv', mode='w', encoding='utf-8') as fgood, \
             open(OUTPUT_PATH + os.sep + 'fbad_all_new.csv', mode='w', encoding='utf-8') as fbad:
+
+        index_NAME = column_name_list.index('NAME')
+        index_INDUSTRY = column_name_list.index('INDUSTRY')
+
         indexn = 1
-        index_feild = 8
-        index_industry = 8
-        index_name = 6
+        index_feild = index_INDUSTRY   # 需要修改的字段
+        index_industry = index_INDUSTRY  # 行业字段
+        index_name = index_NAME  # 企业名字段
 
         for iline in f:
 

@@ -19,18 +19,22 @@ dbname = db_info['dbname']
 tablename = db_info['tablename']
 
 
+
 def product_mongdb_data_to_kafka(mongodb_ip=mongodb_ip, db_name=dbname, table_name=tablename, start_rowkey_id=0):
     """
     主函数  用于测试流式的数据清理脚本，模拟输入添加到kafka消息队列中
     从mongdb 获取爬虫数据，并写入到kafka队列中
+    每个爬虫后台的 数据结果都不一样 ，不方便在取数据的时候 使用ORM
     :param mongodb_ip:
     :param db_name:
     :param table_name:
     :param start_rowkey_id:
     :return:
     """
-
     #
+    # 链接mongodb数据库
+    print(dbname, mongodb_ip)
+
     client = KafkaClient(hosts=kafka_Quorum)
     topic = client.topics[kafka_in_topic]
     # 链接mongodb数据库
@@ -40,15 +44,20 @@ def product_mongdb_data_to_kafka(mongodb_ip=mongodb_ip, db_name=dbname, table_na
     # 选择集合
     col = db[table_name]
     mongodb_find_result = col.find()
+
+    # print("！！！！！！", Company.objects().count())
+    # mongodb_find_result = Company.objects()
+    # print(type(mongodb_find_result), len(mongodb_find_result))
     with topic.get_sync_producer() as producer:
         for index, item in enumerate(mongodb_find_result):
+            # print(item)
             item.pop('_id')
             # 生产者
             data = json.dumps(item).encode(encoding='utf-8')
             producer.produce(data)
             if divmod(index, 10)[1] == 0:
-                time.sleep(10)
-
+                print("index=", index)
+                time.sleep(1)
 
 if __name__ == "__main__":
     product_mongdb_data_to_kafka()

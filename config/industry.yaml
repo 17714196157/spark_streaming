@@ -264,6 +264,12 @@ IT/通信/电子/互联网:
   驾驶: true
   驾驶室: true
 体育/休闲/旅游/娱乐:
+  运动健身: true
+  亲子: true
+  宠物: true
+  爱车: true
+  美食: true
+  休闲娱乐: true
   中国象棋: true
   举重: true
   乒乓: true
@@ -623,6 +629,7 @@ IT/通信/电子/互联网:
   骨伤: true
   骨伤科: true
 商业服务:
+  结婚: true
   移民: true
   装潢: true
   产品设计: true
@@ -805,6 +812,7 @@ IT/通信/电子/互联网:
   阅览: true
   阅览室: true
 服务业:
+  家装: true
   一卡通: true
   人才中介: true
   会员: true

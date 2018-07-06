@@ -1,3 +1,4 @@
+# 数据库db的基本链接信息
 dbconfig:
   shunqi:
    mongodb_ip: '192.168.1.45'
@@ -7,17 +8,23 @@ dbconfig:
    mongodb_ip: '192.168.1.166'
    dbname: "tianyan"
    tablename: "tianyan"
+  meituan:
+   mongodb_ip: '192.168.1.140'
+   dbname: "meituan"
+   tablename: "meituan"
   savedb:
    mongodb_ip: '192.168.1.45'
    dbname: "qq"
-   tablename: "qq"
+   tablename: "company"
+# 现有那些爬虫网页的数据
 WEB_SOURCE_LIST:
-- 'shunqi'
-- 'tianyan'
+#- 'shunqi'
+#- 'tianyan'
+- 'meituan'
 #  websource 流式数据清理，当前爬虫数据来源
 websource: "shunqi"
 # 爬虫数据来源，将数据发生到kafka_in_topic消息队列中
-kafka_in_topic: "test"
+kafka_in_topic: "test2"
 # 清理后数据发送到kafka_out_topic 消息队列中
-kafka_out_topic: "test_new"
+kafka_out_topic: "test2_new"
 

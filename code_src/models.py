@@ -1,0 +1,20 @@
+from mongoengine import Document, IntField, StringField, DateTimeField
+
+class Company(Document):
+    ID = StringField(max_length=255, required=True)
+    PROVINCE =StringField(max_length=255, null=True)
+    CITY = StringField(max_length=255, null=True)
+    REG_CAPITAL = StringField(max_length=255, required=True, default="0")
+    REG_TIME = StringField(max_length=255, required=True, default="0")
+    URBAN_AREA = StringField(max_length=255, null=True)
+    NAME = StringField(max_length=255, required=True)
+    TEL = StringField(max_length=255, required=True)
+    INDUSTRY = StringField(max_length=255, null=True)
+    LEGAL_PERSON = StringField(max_length=255, null=True)
+    REGISTER_CAPITAL = StringField(max_length=255, null=True)
+    REGISTER_TIME = StringField(max_length=255, null=True)
+    ADDRESS = StringField(max_length=255, null=True)
+    EMAIL = StringField(max_length=255, null=True)
+    BUSINESS_LICENSE = StringField(max_length=255, null=True)
+    STATUS = StringField(max_length=255, null=True)
+    WEB_SOURCE = StringField(max_length=255, null=True)

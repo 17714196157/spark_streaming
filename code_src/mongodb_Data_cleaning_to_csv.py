@@ -19,6 +19,22 @@ from config.setting import REGISTER_TIME_ENUM
 from config.setting import REGISTER_CAPITAL_ENUM
 from config.setting import column_name_list
 from config.setting import BASE_PATH, INPUT_PATH, OUTPUT_PATH
+from config.setting import WEB_SOURCE_LIST, dbconfig
+from config.setting import province_map_city
+
+
+def strQ2B(ustring):
+    """全角转半角"""
+    rstring = ""
+    for uchar in ustring:
+        inside_code = ord(uchar)
+        if inside_code == 12288:                              #全角空格直接转换
+            inside_code = 32
+        elif (inside_code >= 65281 and inside_code <= 65374): #全角字符（除空格）根据关系转化
+            inside_code -= 65248
+
+        rstring += chr(inside_code)
+    return rstring
 
 def enumerate_valueof_enum(node_value, REGISTER_ENUM_MAP):
     """
@@ -114,6 +130,7 @@ def standard_value(value, regular_value, Data_cleaning_regular, default_value):
     try:                    #如果value不是字符串，说明还没有找到对应字段值
         value = value.strip()
         value = value.replace(",", "")
+        value = value.replace("，", "")
         value = value.replace("\'", "")
         value = value.replace("\"", "")
         # value = value.replace(" ", "")
@@ -131,23 +148,25 @@ def standard_value(value, regular_value, Data_cleaning_regular, default_value):
     if pd.notnull(Data_cleaning_regular):
         result_value_re_list = []
         for result_value in result_value_list:
-            result_value.replace("o", "0").replace("s", "5")
+            result_value = result_value.replace("O", "0").replace("S", "5").replace(" ", "").replace("Y", "7")    # 电话号码中存在和数字很像的字母，作矫正
+            result_value = result_value.replace("-", "")
+            result_value = strQ2B(result_value)
             res = re.findall(Data_cleaning_regular, result_value)
-
             if len(res) != 0:
                 # print(res)
+                # 正则匹配有可能得到的元素还是一个元组类型
                 if isinstance(res[-1], str):
                     result_value_re_list.append(res[-1])
                 else:
-                    result_value_re_list.append(res[-1][-1])
+                    list_res = [x for x in res[-1] if x.strip() != ""]
+                    result_value_re_list.append(list_res[-1])
             else:
-                # if '|' in Data_cleaning_regular and result_value != "暂无信息" and result_value !="未提供" and result_value !="未披露":
+                # 观察正则匹配识别的字段,原始数据什么样子，正则匹配表达式是什么样子
+                # if '|' in Data_cleaning_regular and result_value != "暂无信息" and result_value !="未提供" and result_value !="未披露" and result_value !="未知":
                 #     print(result_value, Data_cleaning_regular, res)   # 检查电话号码 异常都是什么样式
+                #     input("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
                 #     pass
-
                 result_value_re_list = [str(default_value)]
-        # print(result_value_list, "result_value_re_list:",   result_value_re_list, " Data_cleaning_regular:",Data_cleaning_regular)
-        # print("!!!!!!!", result_value_re_list)
     else:
         if len(result_value_list) != 0:
             result_value_re_list = result_value_list
@@ -190,9 +209,12 @@ def run(mongodb_ip='192.168.1.45', db_name="shunqi", table_name="shunqi", start_
         Data_cleaning_regular_list = df['{}_Data_cleaning_regular'.format(table_name)].values.tolist() # 数据清理的正则表达式
         hbase_name_index = df.loc[(df['hbase字段名'] == 'NAME')].index[0]  # NAME不能为空
         hbase_tel_index = df.loc[(df['hbase字段名'] == 'TEL')].index[0]  # tel不能为空
-
+        hbase_PROVINCE_index = df.loc[(df['hbase字段名'] == 'PROVINCE')].index[0]   # PROVINCE不能为空
+        hbase_CITY_index = df.loc[(df['hbase字段名'] == 'CITY')].index[0]   # CITY 不能为空
+        # print("Data_cleaning_regular_list:", Data_cleaning_regular_list)
         for item in mongodb_find_result:
             item.pop('_id')
+            # item = {'shareholder_list': [], 'manager': '陈麦', 'tel': '0186-88990752', 'establish': '2004年04月23日', 'company_name': '深圳驰名回收旧货有限公司', 'fixed_tel': '0755-22929848', 'status': '在业', 'province_name': '广东', 'city_name': '深圳', 'area_name': '罗湖区', 'change_log_list': [], 'register_capital': '100 (万元)', 'member_list': [], 'company_url': 'http://www.11467.com/shenzhen/co/728562.htm', 'addr': '深圳 深圳市罗湖区清水河5路9栋3楼', 'company_classe': '办公家具公司', 'code': '518023', 'email': '1740966757@qq.com'}
 
             node_list = default_value_list[:]   # 字段值，按顺序保存在一个list中,此处应该是复制一个list对象，而不是指定引用
             node_list_old = default_value_list[:]
@@ -214,7 +236,16 @@ def run(mongodb_ip='192.168.1.45', db_name="shunqi", table_name="shunqi", start_
                     regular_value = df.at[order_n, '{}_regular'.format(table_name)]
                     default_value = default_value_list[order_n]
                     value = standard_value(value, regular_value, Data_cleaning_regular_list[order_n], default_value)
+
                     node_list[order_n] = value
+
+                 # 省份为空 ，就根据城市 给判断一个省份
+                # input("!!!!!!!!!!!!!!!!!!!!!!!" + node_list[hbase_PROVINCE_index])
+                if node_list[hbase_PROVINCE_index] == "未知" or node_list[hbase_PROVINCE_index] == "" or \
+                        node_list[hbase_PROVINCE_index] == "中国":
+                    for province in province_map_city.keys():
+                        if node_list[hbase_CITY_index] in province_map_city[province]:
+                            node_list[hbase_PROVINCE_index] = province
 
             except Exception as e:
                 print("ERROR item=", item)
@@ -223,8 +254,11 @@ def run(mongodb_ip='192.168.1.45', db_name="shunqi", table_name="shunqi", start_
                 continue
 
             # 输出被认为tel不合法的数据的tel字段到文件中
-            if node_list[hbase_tel_index] == "未知" or node_list[hbase_tel_index] == "" or node_list[hbase_name_index] == "未知" and node_list[hbase_name_index] == "":
-                # print("bad数据 ", node_list[hbase_tel_index], node_list[hbase_name_index])
+            if node_list[hbase_tel_index] == "未知" or node_list[hbase_tel_index] == "" or node_list[hbase_name_index] == "未知" or node_list[hbase_name_index] == "":
+                # # 观察被舍弃的数据中 tel 不为空的情况，原始数据是什么样子
+                # if node_list[hbase_tel_index] != "未知" and node_list[hbase_tel_index] != "":
+                #     print(item)
+                #     input("bad数据 {tel},{name}".format(tel=node_list[hbase_tel_index], name=node_list[hbase_name_index]))
                 str_bad_csv = "bad数据 " + node_list_old[hbase_tel_index] + " " + node_list_old[hbase_name_index]+" 原数据： " + ','.join(node_list_old) + '\n'
                 f_all_bad_csv.write(str_bad_csv)
 
@@ -246,6 +280,8 @@ def run(mongodb_ip='192.168.1.45', db_name="shunqi", table_name="shunqi", start_
                     f_all_csv.write(data_csv)
                     data_csv = ""
                     t1 = time.time()
+
+                    ##################
                     # input(node_list)
             else:
                 pass
@@ -253,7 +289,6 @@ def run(mongodb_ip='192.168.1.45', db_name="shunqi", table_name="shunqi", start_
         else:
             f_all_csv.write(data_csv)
     return index
-
 
 
 def modify(filepath_list, outfilepath):
@@ -312,19 +347,34 @@ def modify(filepath_list, outfilepath):
 
 if __name__ == "__main__":
     endindex = 0
-    t1all = time.time()
-    endindex = run(mongodb_ip='192.168.1.45', db_name="shunqi", table_name="shunqi", start_rowkey_id=endindex)
-    t2all = time.time()
-    print(endindex, "shunqi total cost time:", t2all-t1all)
-
-    t1all = time.time()
-    endindex = run(mongodb_ip='192.168.1.166', db_name="tianyan", table_name="tianyan", start_rowkey_id=endindex)
-    t2all = time.time()
-    print(endindex, "tianyan total cost time:", t2all-t1all)
-
-    # filepath_list = [r"D:\MLproject\工具脚本\mongodb爬虫数据导出\dbdata0509\shunqi.csv", r"D:\MLproject\工具脚本\mongodb爬虫数据导出\dbdata0509\tianyan.csv"]
-    filepath_list = [OUTPUT_PATH + os.sep + r"shunqi.csv", OUTPUT_PATH + os.sep + "tianyan.csv"]
+    filepath_list = []
     outfilepath = OUTPUT_PATH + os.sep + r"all_new.csv"
+
+    for webname in WEB_SOURCE_LIST:
+        print(webname, " begin get data")
+        mongodb_ip = dbconfig[webname]['mongodb_ip']
+        dbname = dbconfig[webname]['dbname']
+        tablename = dbconfig[webname]['tablename']
+        filepath_list.append(OUTPUT_PATH + os.sep + "{}.csv".format(webname))
+
+
+        t1all = time.time()
+        endindex = run(mongodb_ip=mongodb_ip, db_name=dbname, table_name=tablename, start_rowkey_id=endindex)
+        t2all = time.time()
+        print(endindex, "{} total cost time:".format(webname), t2all - t1all)
+
+    # endindex = 0
+    # t1all = time.time()
+    # endindex = run(mongodb_ip='192.168.1.45', db_name="shunqi", table_name="shunqi", start_rowkey_id=endindex)
+    # t2all = time.time()
+    # print(endindex, "shunqi total cost time:", t2all-t1all)
+    #
+    # t1all = time.time()
+    # endindex = run(mongodb_ip='192.168.1.166', db_name="tianyan", table_name="tianyan", start_rowkey_id=endindex)
+    # t2all = time.time()
+    # print(endindex, "tianyan total cost time:", t2all-t1all)
+
+
     modify(filepath_list, outfilepath)
 
 
