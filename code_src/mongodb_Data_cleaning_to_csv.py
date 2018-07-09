@@ -3,8 +3,17 @@ import pandas as pd
 import re
 import time
 from pymongo import MongoClient
+from config.setting import gt_insert_time
+from config.setting import lt_insert_time
+
+from datetime import datetime
+from bson.objectid import ObjectId
 import os
 import sys
+gt_insert_time_mongdb_objectID = hex(gt_insert_time)[2:] +'0000000000000000' # 转换成16进制的字符串，再加补齐16个0
+lt_insert_time_mongdb_objectID = hex(lt_insert_time)[2:] +'0000000000000000' # 转换成16进制的字符串，再加补齐16个0
+
+
 sys.path.append("/home/spark_streaming")
 ################################################################################
 # 爬虫数据清理整合脚本
@@ -202,11 +211,14 @@ def run(mongodb_ip='192.168.1.45', db_name="shunqi", table_name="shunqi", start_
     t1 = time.time()
     with open(OUTPUT_PATH + os.sep + table_name+".csv", mode='w', encoding="utf-8") as f_all_csv, \
             open(OUTPUT_PATH + os.sep + table_name+"_bad被舍弃的数据.csv", mode='w', encoding="utf-8") as f_all_bad_csv:
-        mongodb_find_result = col.find()
+
+        # mongodb_find_result = col.find()
+
+
         index = start_rowkey_id
         data_csv = ""
         default_value_list = df['default'].values.tolist()
-        Data_cleaning_regular_list = df['{}_Data_cleaning_regular'.format(table_name)].values.tolist() # 数据清理的正则表达式
+        Data_cleaning_regular_list = df['{}_Data_cleaning_regular'.format(table_name)].values.tolist()  # 数据清理的正则表达式
         hbase_name_index = df.loc[(df['hbase字段名'] == 'NAME')].index[0]  # NAME不能为空
         hbase_tel_index = df.loc[(df['hbase字段名'] == 'TEL')].index[0]  # tel不能为空
         hbase_PROVINCE_index = df.loc[(df['hbase字段名'] == 'PROVINCE')].index[0]   # PROVINCE不能为空
@@ -356,7 +368,7 @@ if __name__ == "__main__":
         dbname = dbconfig[webname]['dbname']
         tablename = dbconfig[webname]['tablename']
         filepath_list.append(OUTPUT_PATH + os.sep + "{}.csv".format(webname))
-
+        print("mongodb_ip：", mongodb_ip)
 
         t1all = time.time()
         endindex = run(mongodb_ip=mongodb_ip, db_name=dbname, table_name=tablename, start_rowkey_id=endindex)

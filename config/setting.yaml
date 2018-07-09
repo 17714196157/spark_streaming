@@ -18,8 +18,8 @@ dbconfig:
    tablename: "company"
 # 现有那些爬虫网页的数据
 WEB_SOURCE_LIST:
-#- 'shunqi'
-#- 'tianyan'
+- 'shunqi'
+- 'tianyan'
 - 'meituan'
 #  websource 流式数据清理，当前爬虫数据来源
 websource: "shunqi"
@@ -27,4 +27,6 @@ websource: "shunqi"
 kafka_in_topic: "test2"
 # 清理后数据发送到kafka_out_topic 消息队列中
 kafka_out_topic: "test2_new"
-
+# mongdb 取出的数据，插入时间的范围
+gt_insert_time: "2018-07-02T00:00:00Z"
+lt_insert_time: "2019-01-01T00:00:00Z"

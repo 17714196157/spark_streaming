@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import yaml
+import time
 BASE_PATH = os.path.dirname(os.path.dirname(__file__))
 # print(BASE_PATH)
 config_path = os.path.join(BASE_PATH, 'config')
@@ -18,6 +19,10 @@ with open(os.path.join(config_path, "setting.yaml"), mode='r', encoding='utf-8')
     kafka_out_topic = str(setting_yml['kafka_out_topic']).encode(encoding='utf-8')  # 字符串转成 bytes
     WEB_SOURCE_LIST = setting_yml['WEB_SOURCE_LIST']  # 单独运行 mongodb_Data_cleaning_to_csv生成csv文件,需要配置需要做那些爬虫数据库
     savedb = dbconfig['savedb']
+    gt_insert_time = setting_yml['gt_insert_time']  # 读取字符串表示的时间戳
+    gt_insert_time = int(time.mktime(time.strptime(gt_insert_time, "%Y-%m-%dT%H:%M:%SZ")))   # 转换成多少秒
+    lt_insert_time = setting_yml['lt_insert_time']
+    lt_insert_time = int(time.mktime(time.strptime(lt_insert_time, "%Y-%m-%dT%H:%M:%SZ")))
 
 
 with open(os.path.join(config_path, "province.yaml"), mode='r', encoding='utf-8') as f:
