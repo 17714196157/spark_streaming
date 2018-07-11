@@ -1,18 +1,18 @@
 fieldname:
-  ADDRESS: address
+  ADDRESS: addr
   BUSINESS_LICENSE: .nan
-  CITY: category1
+  CITY: city
   EMAIL: .nan
-  INDUSTRY: belong
+  INDUSTRY: category
   LEGAL_PERSON: .nan
-  NAME: name
+  NAME: shop_name
   PROVINCE: .nan
   REGISTER_CAPITAL: .nan
   REGISTER_TIME: .nan
   REG_CAPITAL: .nan
   REG_TIME: .nan
   STATUS: .nan
-  TEL: phone
+  TEL: tel
   URBAN_AREA: .nan
 regular:
   ADDRESS: .nan
@@ -28,7 +28,7 @@ regular:
   REG_CAPITAL: .nan
   REG_TIME: .nan
   STATUS: .nan
-  TEL: .nan
+  TEL: \[
   URBAN_AREA: .nan
 Data_cleaning_regular:
   ADDRESS: .nan

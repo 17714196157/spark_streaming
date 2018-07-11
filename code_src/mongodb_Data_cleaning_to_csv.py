@@ -5,15 +5,13 @@ import time
 from pymongo import MongoClient
 from config.setting import gt_insert_time
 from config.setting import lt_insert_time
-
-from datetime import datetime
 from bson.objectid import ObjectId
 import os
 import sys
 gt_insert_time_mongdb_objectID = hex(gt_insert_time)[2:] +'0000000000000000' # 转换成16进制的字符串，再加补齐16个0
 lt_insert_time_mongdb_objectID = hex(lt_insert_time)[2:] +'0000000000000000' # 转换成16进制的字符串，再加补齐16个0
 
-
+print(gt_insert_time_mongdb_objectID)
 sys.path.append("/home/spark_streaming")
 ################################################################################
 # 爬虫数据清理整合脚本
@@ -149,10 +147,12 @@ def standard_value(value, regular_value, Data_cleaning_regular, default_value):
             value = value[:126]
         result_value_list.append(value)
     except Exception as e:
-        # print(str(value))
+
         # regular = regular_value + '''[，。！、……《》（）【】：；“‘”’？￥,\.\?:;' "\(\)]+(\w+)'''
         regular = regular_value + '''[，。！、……《》（）【】：；“‘”’？￥,\.\?:;' "\(\)]+([^\'^\"^,^;]+)'''
         result_value_list = re.findall(regular, str(value))
+
+
 
     if pd.notnull(Data_cleaning_regular):
         result_value_re_list = []
@@ -188,7 +188,9 @@ def standard_value(value, regular_value, Data_cleaning_regular, default_value):
     return result_value_re_list_str
 
 
-def run(mongodb_ip='192.168.1.45', db_name="shunqi", table_name="shunqi", start_rowkey_id=0):
+def run(mongodb_ip='192.168.1.45', db_name="shunqi", table_name="shunqi", start_rowkey_id=0,
+        gt_insert_time_mongdb_objectID=gt_insert_time_mongdb_objectID,
+        lt_insert_time_mongdb_objectID=lt_insert_time_mongdb_objectID,filerootpath=OUTPUT_PATH):
     """
     主函数
     从mongdb 获取爬虫数据，并进行数据处理，输出到文件中，文件名就是mongdb的表名
@@ -209,10 +211,14 @@ def run(mongodb_ip='192.168.1.45', db_name="shunqi", table_name="shunqi", start_
     col = db[table_name]
 
     t1 = time.time()
-    with open(OUTPUT_PATH + os.sep + table_name+".csv", mode='w', encoding="utf-8") as f_all_csv, \
-            open(OUTPUT_PATH + os.sep + table_name+"_bad被舍弃的数据.csv", mode='w', encoding="utf-8") as f_all_bad_csv:
+
+    with open(os.path.join(filerootpath, table_name+".csv"), mode='w', encoding="utf-8") as f_all_csv, \
+            open(os.path.join(filerootpath, table_name+"_bad被舍弃的数据.csv"), mode='w', encoding="utf-8") as f_all_bad_csv:
 
         # mongodb_find_result = col.find()
+        mongodb_find_result = col.find({'_id': {
+            '$gt': ObjectId(gt_insert_time_mongdb_objectID),
+            '$lt': ObjectId(lt_insert_time_mongdb_objectID)}})
 
 
         index = start_rowkey_id
@@ -258,6 +264,7 @@ def run(mongodb_ip='192.168.1.45', db_name="shunqi", table_name="shunqi", start_
                     for province in province_map_city.keys():
                         if node_list[hbase_CITY_index] in province_map_city[province]:
                             node_list[hbase_PROVINCE_index] = province
+                    # input(node_list[hbase_PROVINCE_index] +  " " + node_list[hbase_CITY_index])
 
             except Exception as e:
                 print("ERROR item=", item)
@@ -360,7 +367,7 @@ def modify(filepath_list, outfilepath):
 if __name__ == "__main__":
     endindex = 0
     filepath_list = []
-    outfilepath = OUTPUT_PATH + os.sep + r"all_new.csv"
+    outfilepath = os.path.join(OUTPUT_PATH, "all_new.csv")
 
     for webname in WEB_SOURCE_LIST:
         print(webname, " begin get data")
@@ -374,18 +381,6 @@ if __name__ == "__main__":
         endindex = run(mongodb_ip=mongodb_ip, db_name=dbname, table_name=tablename, start_rowkey_id=endindex)
         t2all = time.time()
         print(endindex, "{} total cost time:".format(webname), t2all - t1all)
-
-    # endindex = 0
-    # t1all = time.time()
-    # endindex = run(mongodb_ip='192.168.1.45', db_name="shunqi", table_name="shunqi", start_rowkey_id=endindex)
-    # t2all = time.time()
-    # print(endindex, "shunqi total cost time:", t2all-t1all)
-    #
-    # t1all = time.time()
-    # endindex = run(mongodb_ip='192.168.1.166', db_name="tianyan", table_name="tianyan", start_rowkey_id=endindex)
-    # t2all = time.time()
-    # print(endindex, "tianyan total cost time:", t2all-t1all)
-
 
     modify(filepath_list, outfilepath)
 

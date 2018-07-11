@@ -8,6 +8,10 @@ dbconfig:
    mongodb_ip: '192.168.1.166'
    dbname: "tianyan"
    tablename: "tianyan"
+  dzdp:
+   mongodb_ip: '192.168.1.166'
+   dbname: "dzdp"
+   tablename: "dzdp"
   meituan:
    mongodb_ip: '192.168.1.140'
    dbname: "meituan"
@@ -21,6 +25,7 @@ WEB_SOURCE_LIST:
 - 'shunqi'
 - 'tianyan'
 - 'meituan'
+- 'dzdp'
 #  websource 流式数据清理，当前爬虫数据来源
 websource: "shunqi"
 # 爬虫数据来源，将数据发生到kafka_in_topic消息队列中
@@ -28,5 +33,5 @@ kafka_in_topic: "test2"
 # 清理后数据发送到kafka_out_topic 消息队列中
 kafka_out_topic: "test2_new"
 # mongdb 取出的数据，插入时间的范围
-gt_insert_time: "2018-07-02T00:00:00Z"
+gt_insert_time: "2018-01-01T00:00:00Z"
 lt_insert_time: "2019-01-01T00:00:00Z"

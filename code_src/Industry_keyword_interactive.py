@@ -170,7 +170,7 @@ def industry_to_stand(industry_tmp, industry_object):
 
 
 
-def run(startid=None, endid=None):
+def run(startid=None, endid=None, filerootpath=OUTPUT_PATH):
     """
     读取csv文件， 将对应行业字段取出，进行分词，将分词列表 与 行业分类关键词配置文件数据 做匹配
     匹配不到数据， 提示交互界面， 人工新增关键字匹配规则
@@ -179,10 +179,9 @@ def run(startid=None, endid=None):
     :return:
     """
     industry_object = industry_classify()
-
-    with open(OUTPUT_PATH + os.sep + 'all_new.csv', mode='r', encoding='utf-8') as f, \
-            open(OUTPUT_PATH + os.sep + 'fgood_all_new.csv', mode='w', encoding='utf-8') as fgood, \
-            open(OUTPUT_PATH + os.sep + 'fbad_all_new.csv', mode='w', encoding='utf-8') as fbad:
+    with open(os.path.join(filerootpath, 'all_new.csv'), mode='r', encoding='utf-8') as f, \
+            open(os.path.join(filerootpath, 'fgood_all_new.csv'), mode='w', encoding='utf-8') as fgood, \
+            open(os.path.join(filerootpath, 'fbad_all_new.csv'), mode='w', encoding='utf-8') as fbad:
 
         index_NAME = column_name_list.index('NAME')
         index_INDUSTRY = column_name_list.index('INDUSTRY')
