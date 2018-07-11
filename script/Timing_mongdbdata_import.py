@@ -72,6 +72,9 @@ Industry_out_run(filerootpath=file_root_path)
 with open(os.path.join(file_root_path, 'fgood_all_new.csv'), mode='r', encoding="utf-8") as f:
     data_pd = pd.read_csv(f, sep=',', header=None)  # skiprows 是需要忽略的行数从第1行开始读，header=None 不设置列索引
     data_pd.columns = column_name_list #自定义列索引
+    data_pd['TEL'] = data_pd['TEL'].astype("str")
+
+    data_pd['WEB_SOURCE'] = data_pd['WEB_SOURCE'].apply(lambda x:x.strip())
     data_json = data_pd.to_dict('records')
     col.insert(data_json)
 
