@@ -53,7 +53,7 @@ if "df" not in vars():
     column_name_list = df['hbase字段名'].values.tolist()
     column_name_list.insert(0, "ID")
     column_name_list.append("WEB_SOURCE")
-    # print(column_name_list)
+    print(column_name_list)
 
     REGISTER_TIME_ENUM = {'1': [-1, 2018],
                           '2': [2017, 2013],
